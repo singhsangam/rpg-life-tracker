@@ -1,0 +1,10 @@
+node_modules
+dist
+.DS_Store
+*.local
+.env
+.env.*
+!.env.example
+sheet-dump
+t2-key-lines.txt
+transcript-extract.txt
