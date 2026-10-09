@@ -14,6 +14,23 @@ export default defineConfig(({ command }) => ({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
+      workbox: {
+        navigateFallback: 'index.html',
+        // Prefer fresh HTML/JS so phone/laptop pick up sync builds quickly
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) =>
+              request.mode === 'navigate' ||
+              request.destination === 'document' ||
+              request.destination === 'script',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'rpg-life-pages',
+              networkTimeoutSeconds: 3,
+            },
+          },
+        ],
+      },
       manifest: {
         name: 'RPG Life Tracker',
         short_name: 'LifeRPG',

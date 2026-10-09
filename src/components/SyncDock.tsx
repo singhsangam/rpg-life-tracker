@@ -41,7 +41,11 @@ export function SyncDock({
   if (!username) {
     return (
       <div className="sync-dock">
-        <button type="button" className="sync-pill status-unconfigured" onClick={onOpenAuth}>
+        <button
+          type="button"
+          className={`sync-pill ${isSyncConfigured() ? 'status-idle' : 'status-unconfigured'}`}
+          onClick={onOpenAuth}
+        >
           <span className="dot" />
           {isSyncConfigured() ? 'Sign in to sync' : 'Local only'}
         </button>
