@@ -229,6 +229,15 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   }, [syncNow])
 
+  // Poll cloud so phone ↔ laptop stay close without manual Sync
+  useEffect(() => {
+    if (!account?.token || !isSyncConfigured()) return
+    const id = window.setInterval(() => {
+      if (document.visibilityState === 'visible') void syncNow()
+    }, 8000)
+    return () => window.clearInterval(id)
+  }, [account?.token, syncNow])
+
   const availableXp = state.player.totalXp - state.player.spentXp
 
   const patch = useCallback((fn: (s: GameState) => GameState) => {

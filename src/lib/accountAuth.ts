@@ -151,7 +151,9 @@ export async function pullLifeRpg(
     payload: GameState
     updated_at: string
   }>(data)
-  if (!row?.payload) return null
+  if (!row?.payload || typeof row.payload !== 'object') return null
+  // Empty placeholder row from a brand-new account
+  if (!(row.payload as GameState).player || !(row.payload as GameState).wheels) return null
   return { ...row.payload, updatedAt: row.updated_at }
 }
 
