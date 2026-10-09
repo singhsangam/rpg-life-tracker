@@ -24,11 +24,14 @@ type Props = {
   onCheckIn: (blockId: string) => void
 }
 
-const SIZE = 340
+const SIZE = 360
 const CX = SIZE / 2
 const CY = SIZE / 2
 const R_OUTER = 138
 const R_INNER = 66
+const R_TICK_OUTER = R_OUTER + 4
+const R_TICK_INNER = R_OUTER - 8
+const R_LABEL = R_OUTER + 24
 
 export function RoutineWheel({
   title,
@@ -93,20 +96,12 @@ export function RoutineWheel({
   const needleMin = half === 'am' ? now : now
   const needle = polar(CX, CY, R_OUTER + 8, halfMinToAngle(needleMin, half))
 
-  const labels =
-    half === 'am'
-      ? [
-          { t: '12', min: 0 },
-          { t: '3', min: 3 * 60 },
-          { t: '6', min: 6 * 60 },
-          { t: '9', min: 9 * 60 },
-        ]
-      : [
-          { t: '12', min: 12 * 60 },
-          { t: '3', min: 15 * 60 },
-          { t: '6', min: 18 * 60 },
-          { t: '9', min: 21 * 60 },
-        ]
+  // Full 12-hour face: 12, 1, 2, … 11 (not only cardinals)
+  const labels = Array.from({ length: 12 }, (_, i) => {
+    const hour = i === 0 ? 12 : i
+    const absMin = (half === 'am' ? 0 : 12 * 60) + i * 60
+    return { t: String(hour), min: absMin }
+  })
 
   return (
     <section className={`wheel-card ${live ? 'wheel-card--active' : 'wheel-card--dim'}`}>
@@ -146,8 +141,23 @@ export function RoutineWheel({
             className="wheel-ring"
             filter={live ? `url(#glow-${uid})` : undefined}
           />
-          <line x1={CX} y1={18} x2={CX} y2={SIZE - 18} className="wheel-guide" />
-          <line x1={18} y1={CY} x2={SIZE - 18} y2={CY} className="wheel-guide" />
+          <line x1={CX} y1={22} x2={CX} y2={SIZE - 22} className="wheel-guide" />
+          <line x1={22} y1={CY} x2={SIZE - 22} y2={CY} className="wheel-guide" />
+
+          {labels.map((l) => {
+            const outer = polar(CX, CY, R_TICK_OUTER, halfMinToAngle(l.min, half))
+            const inner = polar(CX, CY, R_TICK_INNER, halfMinToAngle(l.min, half))
+            return (
+              <line
+                key={`tick-${l.min}`}
+                x1={inner.x}
+                y1={inner.y}
+                x2={outer.x}
+                y2={outer.y}
+                className="hour-tick"
+              />
+            )
+          })}
 
           {slices.map((slice) => {
             const showLabel =
@@ -208,7 +218,7 @@ export function RoutineWheel({
           )}
 
           {labels.map((l) => {
-            const p = polar(CX, CY, R_OUTER + 20, halfMinToAngle(l.min, half))
+            const p = polar(CX, CY, R_LABEL, halfMinToAngle(l.min, half))
             return (
               <text
                 key={l.t + l.min}
